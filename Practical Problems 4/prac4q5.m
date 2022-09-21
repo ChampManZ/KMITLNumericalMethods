@@ -1,4 +1,4 @@
-%% Practice Problems 5 Question 5
+%% Practice Problems 4 Question 5
 
 % Plot the true function from 0 to 5
 figure(1);
