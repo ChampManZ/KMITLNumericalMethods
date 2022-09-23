@@ -1,16 +1,18 @@
 %% Practical Problems 5 Question 4
 
 % Function
-xplot = 1:5;
-f = @(x) (exp(x) * cos(x).^2 - 2);
+func = @(x) exp(x).*(cos(x).^2) - 2;
+x_interval = 0:0.5:5;
 
-% I want to store each root for x = 0 to 5 to check what is the real root
-% อันนี้คือสร้าง array เปล่าไว้เพื่อเพิ่ม root เข้าไปทีละอัน
-r = double.empty(0, 5);
+% Plot Graph
+grid on
+hold on
+fplot(func, [0 5]);
 
-for i=0:5
-    r(end+1) = fzero(f, i);
+% Find root using fzero
+for i=1:length(x_interval)
+    myRoot(i) = fzero(func, x_interval(i));
 end
 
-grid on
-plot(xplot, f);
+% Plot Root
+plot(myRoot, 0, 'gx');
