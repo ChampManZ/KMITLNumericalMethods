@@ -1,4 +1,4 @@
-%% Practical Problems 5 Question 5
+%% Practical Problems 5 Question 5.2
 
 i = 1;
 
@@ -14,19 +14,19 @@ approx_err = 1;
 tolerance = 0.0001;
 nTerms = 100;
 
-g = @(x) (-exp(-x)) + x.^2;
+g = @(x) sqrt(exp(-x) + x);
 
 % Algorithm (Lecture 5 Slide 11)
 % Step 1.) Pick initial value
-x = 0;
+x0 = 1;
 
 % Step 2.) Calculate x1 = g(x0)
-x1 = g(x);
+x = g(x0);
 
 % Step 3.) Check that abs(gDIFF(x0)) < 1 or not
 % เสริม: ดิฟไม่ต้องใช้คำสั่ง ใช้มือคำนวณแล้วมาพิมพ์เอา
-gDiff = @(x) exp(-x) + 2*x;
-if gDiff(x(1)) < 1
+gDiff = @(x) (1-exp(-x)) ./ (2*exp(-x) + 2*x);
+if gDiff(x0) < 1
     while approx_err > tolerance
         i = i + 1;
         if i > nTerms
@@ -38,5 +38,5 @@ if gDiff(x(1)) < 1
 else
     disp('Derivative larger than 1, stopping.');
 end
-disp(['Number of iteration: ' , num2str(i)]);
-disp(x1);
+disp(['Number of iteration: ' , num2str(i)]);  % -1 because in math i start at 0
+disp([x0 x]);
