@@ -1,23 +1,33 @@
-A = [1 -3 0; 0 1 3; 2 -10 2]; % The same matrix as in question 12 and 13
-L = zeros(3); % Pre-allocate memory for L
-    
-% Find the matrix U from row reduction but scale first row so pivot is 1
-L(1,1) = A(1,1); % Save the value of L11
-A(1,:) = A(1,:)*1/L(1,1); % Scale so pivot is 1
+f1 = @(x,y) 3.*x.^2 + 2.*y.^2 -25 ; 
+f2 = @(x,y) 2.*x.^2 -y -15 ; 
+fimplicit( f1 )
+hold on
+fimplicit( f2 )
 
-% Make the first pivot have 0's underneath it
-L(2,1) = A(2,1); % Save L21 
-A(2,:) = A(2,:) - L(2,1) * A(1,:) ; % This should be R2 --> R2 - L21*R1
+% One possible solution is to create functions for each Jacobian entry
+J11 = @(x,y) 6.*x ; % Partial derivative of top equation with respect to x
+J12 = @(x,y) 4.*y ; % Partial derivative of top equation with respect to y
+J21 = @(x,y) 4.*x ; % Partial derivative of bottom equation with respect to x
+J22 = @(x,y) -1 ; % Partial derivative of bottom equation with respect to y
 
-L(3,1) = A(3,1); % Save L31
-A(3,:) = A(3,:) - L(3,1) * A(1,:) ; % This should be R3 --> R3 - L31*R1
-
-L(2,2) = A(2,2); % Save L22
-A(2,:) = A(2,:)*1/L(2,2); % Scale this row so second pivot is 1
-
-% Make 0's underneath it
-L(3,2) = A(3,2); % Save L32
-A(3,:) = A(3,:) - L(3,2) * A(2,:) ; % This should be R3 --> R3 - L32*R2
-
-L(3,3) = A(3,3); % Save L33
-A(3,:) = A(3,:)*1/L(3,3); % Scale last pivot to be 1
+% Choose an initial guess for the method then make a loop with your own
+% stopping criteria
+% z = [-3, 1; -2.5 -1.5; 3 1; 2.5 -1.5]; % Choose inputs - advanced users use ginput()
+z = [-3 -2.5 3 2.5; 1 -1.5 1 -1.5];
+% x = zeros(100, 2) ; % Pre-allocate zeros (if from ginput() make x a multidimensional array)
+tol = 0.0001 ;
+disp('The roots are:')
+for p = 1:size(z,2) % If using ginput() nest your while in a for loop
+    k = 0; % Initialise while loop counter
+    dif = 1; % Set to enter loop
+    x = z(:, p); % Initial x-values
+    while dif > tol
+        k = k + 1; % Increas counter
+        J = [J11(x(1,k), x(1,k)) J12(x(1,k), x(2, k)); J21(x(1,k), x(2,k)) J22(x(1,k), x(2,k))]; % Calculate Jacobian
+        F = [f1(x(1,k), x(2,k)) ; f2(x(1,k), x(2,k))]; % Calculate system values
+        x(:, k+1) = x(:, k) - J\F ; % Newton's method
+        dif = sqrt(x(k+1) - x(k)); % Just use the length of the absolute error vector
+    end
+    plot(x(1,k+1), x(2,k+1), 'rO') % Plot the roots
+    disp(x(:, k+1))
+ end
