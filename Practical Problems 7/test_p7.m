@@ -1,31 +1,70 @@
+%{
+The first step in solving this problem required you to linearise the
+equation:
+
+y = alpha*x^beta
+
+Linearise this with respect to log10
+%}
+
 % Input the data
-x = [0 2 4 6 9 11 12 15 17 19] ;
-y = [5 6 7 6 9 8 8 10 12 12] ;
-n = 10 ; % Number of data points should be calculated from the input vectors rather than counted manualy
+x = [ 400 70 45 2 0.3 0.16 ] ;
+y = [ 270 82 50 4.8 1.45 0.97 ] ;
 
-% Obtain the necessary columns of the table
-xy = x.*y ;
-xsq = x.^2 ; % x-squared column
-      
-% Obtain the values needed for the formulae
-sumx = sum(x) ;
-sumy = sum(y) ;
-sumxy = sum(xy) ;
-sumxsq = sum(xsq) ;
-xbar = mean(x) ;
-ybar = mean(y) ;
+metabolism = 200;
+    
+% Create the data you need on the horizontal and vertical axes for the power equation
 
-% Calculate the coefficients using the formulae in the lecture notes
-% (either algebraic formulae or set up the matrix and solve with the backslash
-% operator, Gauss-Jordan elimination or LU-factorisation.
-a1 = ( (n * sumxy) - (sumx * sumy) ) / ( n * sumxsq - (sumx)^2 );
-a0 = ybar - (a1 * xbar);
+% log(y) = log(alpha) + beta(log(x))
+X = log10(x) ;
+Y = log10(y) ;
+ 
+% Get the fitting equation coefficients using polyval/polyfit or your own formulae
+linvar = polyfit(X, Y,1); %linvar = a
+liny = polyval(linvar, X);
+    
+% Obtain alpha and beta from the coefficients
+alpha = linvar(2) ; %lin a0
+beta = linvar(1) ;  %lin a1
+
+actual_alpha = 10.^(alpha);
+actual_beta = beta; % this also stays the same
 
 % Calculate the fitted data
-xfit = linspace(0,20); % Include enough x-values for the fitting function so that it looks smooth
-yfit = @(x) a0 + a1*x ; % The equation of the line using the xfit points
+
+%y = alpha*x^beta
+f = @(x) actual_alpha .* (x).^actual_beta ;
+linf = @(x) alpha + beta .* x; % y = a0 + a1 * x
+
+xfit = linspace(min(x) , max(x)); 
+yfit = f(xfit) ; 
 
 % Plot both raw data and the fitting equation on the same graph
-plot(x, y , 'ro');
+sgtitle('Prediction of Animal Metabolism')
+
+subplot(1,2,1)
+
+plot(xfit, yfit, 'b-') ;
+grid on
 hold on
-plot(xfit, yfit(xfit), 'b')
+plot(x ,y, 'b.', 'Markersize', 10) ;
+plot(metabolism ,f(metabolism), 'bo') % prediction
+title('Power Equation');
+
+subplot(1,2,2)
+
+plot(X, liny, 'r-');
+grid on
+hold on;
+plot(X, Y, 'r.', 'Markersize', 10);
+plot(log10(metabolism), linf(log10(metabolism)), 'ro'); % prediction
+title('Linearised Power Equation');
+
+fprintf('The fitting equation is y = %f x^( %f )\n', actual_alpha, actual_beta);
+fprintf('Estimated metabolism of 200kg tiger is: %f (W)\n\n', f(metabolism));
+
+fprintf("The power equation's correlation coefficient is %f \n", correlation_coefficient(x,y))
+fprintf("The linearised power equation's correlation coefficient is %f \n\n", correlation_coefficient(X,Y))
+    
+% Calculate and display the predicted metabolism of a 200kg tiger 
+...
